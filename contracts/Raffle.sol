@@ -12,9 +12,12 @@ error Raffle__NotEnoghETHEntered();
 
 contract Raffle{
 
-    /*State variables */abi
+    /* State variables */abi
     uint256 private immutable i_entraceFee;
     address payable[] private s_players;
+
+    /* Events */
+    event RaffleEnter(address indexed player);
 
     constructor(uint256 entranceFee){
         i_entraceFee = entranceFee;
@@ -27,6 +30,8 @@ contract Raffle{
         }
 
         s_players.push(payable(msg.sender))
+        emit RaffleEnter(msg.sender)
+        //Emit an event when we update a dynamic 
 
     }
 
