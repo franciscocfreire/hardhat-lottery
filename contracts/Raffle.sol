@@ -39,6 +39,8 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface{
     /* Lottery Variables */
     address private s_recentWinner;
     RaffleState private s_raffleState; // to pending, false, closed, calculating
+    uint256 private s_lastTimeStamp;
+    uint256 private immutable i_interval;
 
     /* Events */
     event RaffleEnter(address indexed player);
@@ -50,7 +52,8 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface{
         uint256 entranceFee,
         bytes32 gasLane,
         uint64 subscriptionId,
-        uint32 callbackGasLimit
+        uint32 callbackGasLimit,
+        uint256 interval
         ) VRFConsumerBaseV2(vrfCoordinatorv2){
         i_entraceFee = entranceFee;
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorv2);
@@ -58,6 +61,8 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface{
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
         s_raffleState = RaffleState.OPEN;
+        s_lastTimeStamp = block.timestamp;
+        i_interval = interval;
 
     }
 
@@ -85,7 +90,15 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface{
      * 3. Our subscription is funded with LINK
      * 4. The lottery should be in an "open" state;
      */
-    function checkUpkeep(bytes calldata) external override returns (bool upkeepNeeded, bytes memory performData){
+    function checkUpkeep(bytes calldata) external override 
+    returns (bool upkeepNeeded, bytes memory){
+        bool isOpen = (RaffleState.OPEN == s_raffleState);
+        bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_interval);
+        bool hasPlayers = (s_players.length > 0);
+        bool hasBalance = address(this).balance > 0;
+        upkeepNeeded = (isOpen && timePassed && hasPlayers && hasBalance);
+
+        // block.timestamp - last block timestamp > interval
 
     }
 
@@ -114,6 +127,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface{
         address payable recentWinner = s_players[indexOfWinner];
         s_recentWinner = recentWinner;
         s_raffleState = RaffleState.OPEN;
+        s_players = new address payable[](0);
         (bool success,) = recentWinner.call{value: address(this).balance}("");
         if(!success){
             revert Raffle__TransferFailed();
