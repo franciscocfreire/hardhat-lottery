@@ -6,7 +6,7 @@
 // Chainlink Oracle -> Randomness, Automated Execution (Chainlink Keeper)
 
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
@@ -57,7 +57,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface{
 
     /* Functions */
     constructor(
-        address vrfCoordinatorv2, 
+        address vrfCoordinatorv2, // contract
         uint256 entranceFee,
         bytes32 gasLane,
         uint64 subscriptionId,
