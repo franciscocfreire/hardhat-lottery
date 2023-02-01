@@ -77,7 +77,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface{
 
     function enterRaffle() public payable {
         // require msg.value > i_entranceFee, "not enough ETH"
-        if(msg.value <= i_entraceFee){
+        if(msg.value < i_entraceFee){
             revert Raffle__NotEnoghETHEntered();
         }
         if(s_raffleState != RaffleState.OPEN){
@@ -179,5 +179,9 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface{
 
     function getRequestConfimations() public pure returns(uint256){
         return REQUEST_CONFIMATIONS;
+    }
+
+    function getInterval() public view returns(uint256){
+        return i_interval;
     }
 }
