@@ -8,16 +8,16 @@ const { verify } = require("../utils/verify")
 
 const FUND_AMOUNT = ethers.utils.parseEther("1") // 1 Ether, or 1e18 (10^18) Wei
 
-const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("2")
+const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("1")
 
 module.exports = async function ({ getNamedAccounts, deployments }) {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
 
-    let vrfCoordinatorV2Address, subscriptionId
-    if (developmentChains.includes(network.name)) {
-        const vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
+    let vrfCoordinatorV2Address,vrfCoordinatorV2Mock, subscriptionId
+    if (chainId == 31337) {
+        vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
 
         vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
         const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
@@ -47,6 +47,10 @@ module.exports = async function ({ getNamedAccounts, deployments }) {
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1,
     })
+
+    if(chainId == 31337){
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, raffle.address)
+    }
 
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
