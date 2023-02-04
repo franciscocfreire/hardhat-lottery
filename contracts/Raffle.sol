@@ -50,7 +50,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     /* Events */
     event RaffleEnter(address indexed player);
-    event RequestRaffleWinnter(uint256 indexed requestId);
+    event RequestRaffleWinner(uint256 indexed requestId);
     event WinnerPicked(address indexed winner);
 
     /* Functions */
@@ -108,7 +108,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
     function performUpkeep(bytes calldata) external override {
         // Request the random number
-        // Once we gert it, do something with it
+        // Once we get it, do something with it
         // 2 transaction process
         (bool upkeepNeeded, ) = checkUpkeep("");
         if (!upkeepNeeded) {
@@ -129,7 +129,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
             NUM_WORDS
         );
 
-        emit RequestRaffleWinnter(requestId);
+        emit RequestRaffleWinner(requestId);
     }
 
     function fulfillRandomWords(uint256, uint256[] memory randomWords) internal override {
